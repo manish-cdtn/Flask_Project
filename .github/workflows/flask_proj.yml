@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - master
+      - main
 
 name: Build & Deploy (CI/CD docker)
 
@@ -25,8 +25,8 @@ jobs:
     - name: Deploy on AWS EC2
       env:
         PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY  }}
-        HOSTNAME: ${{ secrets.HOSTNAME_R_LANG  }}
-        USER_NAME: ${{ secrets.USERNAME_R_LANG  }}
+        HOSTNAME: ${{ secrets.HOSTNAME_FLASK_PROJ  }}
+        USER_NAME: ${{ secrets.USERNAME_FLASK_PROJ  }}
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       run: |
         echo "$PRIVATE_KEY" > private_key.pem && chmod 600 private_key.pem
@@ -34,10 +34,9 @@ jobs:
         cd /home/ubuntu/flask_project
         eval "$(ssh-agent -s)"; ssh-add ~/.ssh/id_rsa; ssh -T git@github.com;
         git fetch
-        git checkout dev_r_lang
+        git checkout main
         git pull
         source venv/bin/activate
-        pip install -r dev_requirements.txt
+        pip install -r requirements.txt
         deactivate
-        sudo systemctl restart tmars_assets.service
         '
