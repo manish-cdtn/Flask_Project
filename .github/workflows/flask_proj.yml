@@ -1,0 +1,43 @@
+on:
+  push:
+    branches:
+      - master
+
+name: Build & Deploy (CI/CD docker)
+
+jobs:
+  build:
+    name: Build & Deploy (CI/CD docker)
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Deploy on AWS EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY  }}
+        HOSTNAME: ${{ secrets.HOSTNAME_R_LANG  }}
+        USER_NAME: ${{ secrets.USERNAME_R_LANG  }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem && chmod 600 private_key.pem
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} '
+        cd /home/ubuntu/flask_project
+        eval "$(ssh-agent -s)"; ssh-add ~/.ssh/id_rsa; ssh -T git@github.com;
+        git fetch
+        git checkout dev_r_lang
+        git pull
+        source venv/bin/activate
+        pip install -r dev_requirements.txt
+        deactivate
+        sudo systemctl restart tmars_assets.service
+        '
