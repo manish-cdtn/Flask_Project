@@ -1,4 +1,9 @@
-Flask
-flask_sqlalchemy
+Flask==2.3.2
 psycopg2-binary  
 gunicorn==21.2.0
+Flask-Cors==4.0.0
+boto3==1.28.18
+SQLAlchemy==2.0.19
+aurora-data-api==0.4.0
+sqlalchemy-aurora-data-api==0.4.1
+python-dotenv==1.0.0
