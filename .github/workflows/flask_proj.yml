@@ -31,7 +31,7 @@ jobs:
       run: |
         echo "$PRIVATE_KEY" > private_key.pem && chmod 600 private_key.pem
         ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} '
-        cd /home/ubuntu/flask_project
+        cd /home/ubuntu/Flask_Project
         eval "$(ssh-agent -s)"; ssh-add ~/.ssh/id_rsa; ssh -T git@github.com;
         git fetch
         git checkout main
