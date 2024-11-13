@@ -3,7 +3,9 @@ from flask import Blueprint, request
 from db_connect import get_db_session
 from services.animal_volume_service import AnimalVolumeService
 from util.commom_util import build_response
+import logging
 
+logger = logging.getLogger(__name__)
 
 animal_volume_measurements_bp = Blueprint(
     name='animal_volume_measurements_bp',
@@ -15,7 +17,8 @@ animal_volume_measurements_bp = Blueprint(
 @animal_volume_measurements_bp.route('/<uuid:organization_id>/studies/<uuid:study_id>/animal_volume/animal_id/<uuid:animal_id>', methods=['GET'])
 def get_animal_volume(organization_id, study_id, animal_id):
     session = get_db_session()
-    try:               
+    try:     
+        logger.info("############# Inside Animal Volume GET Method #############")          
         service = AnimalVolumeService(session)
         animal_volume_data = service.get_animal_volume(animal_id)  
         return build_response(http_status=HTTPStatus.OK, body={'data': animal_volume_data})    
